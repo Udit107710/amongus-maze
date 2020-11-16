@@ -141,6 +141,7 @@ class Maze():
         self.canvas.bind('<ButtonRelease-1>', self.reset)
 
         self.start = time.perf_counter() #Start of timer
+        self.local_start = time.perf_counter()
 
     """Depth first search algorithm:
     Finds a possible maze;
@@ -322,6 +323,7 @@ class Maze():
         self.tkroot.setvar(name="yvis", value=0)
         self.tkroot.setvar(name="done", value=0)
         self.visited.clear()
+        self.local_start = time.perf_counter()
         print('Reset')
 
     """Congratulations screen"""
@@ -335,17 +337,21 @@ class Maze():
         self.congratsc.configure(bg='#a6a48f')
         self.canvas.pack_forget()
 
-        self.congratsc.create_text(450, 75, font="Times 20 bold", text="Congratulations! You completed the maze in %.3f seconds"
-            % (float(self.end)-float(self.start)))
+        self.congratsc.create_text(450, 75, font="Times 16 bold", text="Congratulations! You completed the maze in %.3f seconds for a total of %.3f seconds."
+            % (float(self.end)-float(self.local_start), float(self.end)-float(self.start)))
 
         """Recover old maze"""
-        self.start = time.perf_counter()
-        self.recover = Button(self.congratsc, text="Try the maze again", command=lambda:[self.congratsc.pack_forget(), self.canvas.pack()])
+        self.recover = Button(self.congratsc, text="Try the maze again", command=lambda:[self.congratsc.pack_forget(), self.canvas.pack(), self.reinit_timer()])
         self.congratsc.create_window(400, 200, anchor=CENTER, window=self.recover)
 
         """Create new maze"""
         self.new_maze = Button(self.congratsc, text="New maze!", command=lambda:[self.congratsc.pack_forget(), self.canvas.pack(), self.setup()])
         self.congratsc.create_window(500, 200, anchor=CENTER, window=self.new_maze)
+
+    """Reinitialize timer"""
+    def reinit_timer(self):
+        self.start = time.perf_counter()
+        self.local_start = time.perf_counter()
 
 maze = Maze()
 maze.input()
